@@ -24,10 +24,35 @@ def load_models():
     
     try:
         print("Loading models...", flush=True)
-        model = joblib.load('model.pkl')
-        scaler = joblib.load('scaler.pkl')
-        label_encoder = joblib.load('label_encoder.pkl')
-        print("Models loaded!", flush=True)
+        
+        # Get the directory where this file is located (api/)
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        
+        # Go up one level to root directory
+        base_dir = os.path.dirname(current_dir)
+        
+        # Build full paths to model files
+        model_path = os.path.join(base_dir, 'model.pkl')
+        scaler_path = os.path.join(base_dir, 'scaler.pkl')
+        label_path = os.path.join(base_dir, 'label_encoder.pkl')
+        
+        print(f"Base directory: {base_dir}", flush=True)
+        print(f"Loading model from: {model_path}", flush=True)
+        
+        # Check if files exist
+        if not os.path.exists(model_path):
+            raise FileNotFoundError(f"model.pkl not found at {model_path}")
+        if not os.path.exists(scaler_path):
+            raise FileNotFoundError(f"scaler.pkl not found at {scaler_path}")
+        if not os.path.exists(label_path):
+            raise FileNotFoundError(f"label_encoder.pkl not found at {label_path}")
+        
+        # Load models
+        model = joblib.load(model_path)
+        scaler = joblib.load(scaler_path)
+        label_encoder = joblib.load(label_path)
+        
+        print("Models loaded successfully!", flush=True)
     except Exception as e:
         print(f"Error loading models: {e}", flush=True)
         traceback.print_exc()
@@ -92,7 +117,6 @@ def predict():
         })
 
     except Exception as e:
-        print(f"Error: {e}", flush=True)
+        print(f"Error in predict: {e}", flush=True)
         traceback.print_exc()
         return jsonify({'error': str(e), 'status': 'failed'}), 500
-
